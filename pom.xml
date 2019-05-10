@@ -254,7 +254,7 @@
         <docker.generator.version>0.990.4-SNAPSHOT</docker.generator.version>
         <fabric8.kubernetes.client.version>4.1.2</fabric8.kubernetes.client.version>
         <jackson.version>2.9.8</jackson.version>
-        <maven.jacoco.plugin.version>0.8.3</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.4</maven.jacoco.plugin.version>
         <mvn.processor.plugin.version>2.2.4</mvn.processor.plugin.version>
         <mvn.shade.plugin.version>3.2.1</mvn.shade.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
