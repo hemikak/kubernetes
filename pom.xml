@@ -332,7 +332,7 @@
         <docker.java.version>3.1.5</docker.java.version>
         <fabric8.knative.client.version>4.6.4</fabric8.knative.client.version>
         <fabric8.kubernetes.client.version>4.6.4</fabric8.kubernetes.client.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.10.3</jackson.version>
         <javax.validation.api.version>2.0.0.Final</javax.validation.api.version>
         <lombok.version>1.18.10</lombok.version>
         <maven.jacoco.plugin.version>0.8.3</maven.jacoco.plugin.version>
