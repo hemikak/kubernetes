@@ -31,9 +31,72 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [[ "$1" != "" ]]
 then
-    brew update
+    # kubernetes-deployment test
+    pushd "$SCRIPT_DIR"/examples/kubernetes-deployment /dev/null 2>&1 || exit
+        brew update
+        brew upgrade minikube
+        brew link minikube
+        minikube start --vm-driver=hyperkit
+        eval $(minikube docker-env)
+        docker rmi kubernetes:v1.0 || true
+        while read -r line
+        do
+            [[ $line != \$* ]] && continue
+            command=${line/$ /}
+
+            # Modify commands when needed
+            if [[ $command = \ballerina* ]]
+            then
+                command=${command/ballerina/$1}
+            elif [[ $command = \kubectl\ get\ pods* ]]
+            then
+              printf "info: sleeping for 5 seconds\n"
+              sleep 5
+            elif [[ $command = \curl\ https://localhost* ]]
+            then
+                MINIKUBE_IP=$(minikube ip)
+                command=${command/localhost/$MINIKUBE_IP}
+
+                NODEPORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" svc helloworldep-svc)
+                command=${command/<32417>/$NODEPORT}
+            elif [[ $command = \minikube\ ip ]]
+            then
+                continue
+            elif [[ $command == "curl https://192.168.99.100:<32417>/helloWorld/config/jane -k" ]]
+            then
+                continue
+            fi
+
+            printf "$> %s\n" "$command"
+            CMD_OUTPUT=$(${command} | tee /dev/tty)
+
+
+            # Assert outputs
+            if [[ $command = \curl*jane* && $CMD_OUTPUT != *"jane3@ballerina.com"* ]]
+            then
+                printf "error: cannot find curl output\n"
+                exit 1;
+            fi
+
+            if [[ $command = \curl*john* && $CMD_OUTPUT != *"john@ballerina.com"* ]]
+            then
+                printf "error: cannot find curl output\n"
+                exit 1;
+            fi
+        done < "kubernetes_deployment.out"
+
+        printf "\n"
+        # Clean up
+        kubectl delete -f ./kubernetes
+        sleep 7
+        docker rmi kubernetes:v1.0
+        rm kubernetes_deployment.jar
+        rm -rf docker kubernetes
+        minikube stop
+    popd > /dev/null 2>&1 || exit
     # openshift-deployment test
     pushd "$SCRIPT_DIR"/examples/openshift-deployment /dev/null 2>&1 || exit
+        brew update
         minishift update --update-addons -v 1
         minishift version
         minishift start
